@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icon192/192.png" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+
+    }
+    h1 {
+      color: #000000;
+    }
+    .tracker {
+      background: #a0b4d0;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      box-shadow: 0 2px 5px rgba(155, 57, 57, 0.1);
+    }
+    input {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .add {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .subtract {
+      background-color: #f44336;
+      color: white;
+    }
+    .balance {
+      font-size: 1.2em;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  
+  <h1>Student Budget Tracker</h1>
+  <div class="tracker">
+    <label for="amount">Enter Amount:</label>
+    <input type="number" id="amount" placeholder="e.g. 100">
+    <div>
+      <button class="add" onclick="addAmount()">Add</button>
+      <button class="subtract" onclick="subtractAmount()">Subtract</button>
+    </div>
+    <div class="balance">Allowance Balance: ₱<span id="balance">0</span></div>
+  </div>
+
+  <script>
+  // Load saved balance from localStorage when the page opens
+  let balance = parseFloat(localStorage.getItem("balance")) || 0;
+  document.getElementById('balance').textContent = balance.toFixed(2);
+
+  function addAmount() {
+    const amount = parseFloat(document.getElementById('amount').value);
+    if (!isNaN(amount) && amount > 0) {
+      balance += amount;
+      updateBalance();
+    } else {
+      alert("Please enter a valid positive number.");
+    }
+  }
+
+  function subtractAmount() {
+    const amount = parseFloat(document.getElementById('amount').value);
+    if (!isNaN(amount) && amount > 0) {
+      balance -= amount;
+      updateBalance();
+    } else {
+      alert("Please enter a valid positive number.");
+    }
+  }
+
+  function updateBalance() {
+    document.getElementById('balance').textContent = balance.toFixed(2);
+    document.getElementById('amount').value = "";
+    // Save balance to localStorage
+    localStorage.setItem("balance", balance);
+  }
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("Service Worker registered:", reg))
+      .catch(err => console.log("Service Worker registration failed:", err));
+  }
+</script>
+
+</body>
+</html>
