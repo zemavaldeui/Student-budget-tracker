@@ -56,7 +56,7 @@
     }
     .app-logo {
     width: 100px; 
-    height: auto; 
+    height: auto;  
     }
 
   </style>
@@ -78,7 +78,7 @@
   </div>
 
   <script>
-
+  // Load saved balance from localStorage when the page opens
   let balance = parseFloat(localStorage.getItem("balance")) || 0;
   document.getElementById('balance').textContent = balance.toFixed(2);
 
@@ -118,4 +118,3 @@
 
 </body>
 </html>
-
