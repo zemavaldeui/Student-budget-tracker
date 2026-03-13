@@ -118,6 +118,11 @@ li {
     border-radius: 10px;
     border: 1px solid var(--border);
 }
+.section-divider {
+    margin-top: 25px;   /* space above */
+    padding-top: 20px;  /* space inside */
+    border-top: 2px solid var(--border); /* divider line */
+}
 </style>
 </head>
 <body>
@@ -135,23 +140,24 @@ li {
 
     <h2>Budget Prediction</h2>
     <div id="prediction"></div>
-</div>
 
-<div class="container">
-    <h2>Available Balance</h2>
-    <div class="total-box">P<span id="t">0.00</span></div>
-    
-    <div class="input-section">
-        <input type="text" id="k" placeholder="Item Name">
-        <input type="number" id="v" placeholder="Amount">
+    <!-- Available Balance with spacing -->
+    <div class="section-divider">
+        <h2>Available Balance</h2>
+        <div class="total-box">P<span id="t">0.00</span></div>
+        
+        <div class="input-section">
+            <input type="text" id="k" placeholder="Item Name">
+            <input type="number" id="v" placeholder="Amount">
+        </div>
+
+        <div class="button-row">
+            <button class="btn-add" onclick="addItem()">+ ADD ITEM</button>
+            <button class="btn-clear" onclick="resetAll()">RESET</button>
+        </div>
+
+        <ul id="l"></ul>
     </div>
-
-    <div class="button-row">
-        <button class="btn-add" onclick="addItem()">+ ADD ITEM</button>
-        <button class="btn-clear" onclick="resetAll()">RESET</button>
-    </div>
-
-    <ul id="l"></ul>
 </div>
 
 <script>
