@@ -1,119 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Budget Tracker</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon192/192.png" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f4f4f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      text-align: center;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="manifest" href="manifest.json" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+    --bg: #D3D3D3;
+    --card: #37a7cf;
+    --text-main: #ffffff;
+    --text-sub: #ffffff;
+    --primary: #50C878;
+    --danger: #e84b20;
+    --border: #676574;
+}
+body { 
+    font-family: 'Inter', -apple-system, sans-serif; 
+    background: var(--bg);
+    color: var(--text-main);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    padding: 50px 20px;
+}
+.container { 
+    background: var(--card); 
+    padding: 30px; 
+    border-radius: 16px; 
+    width: 100%;
+    max-width: 380px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+h2 { 
+    font-size: 0.85rem; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    color: var(--text-sub); 
+    margin: 0 0 10px 0; 
+}
+.total-box {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+    color: var(--text-main);
+}
+.input-section { margin-bottom: 25px; }
+input { 
+    width: 100%; 
+    box-sizing: border-box;
+    margin-bottom: 12px; 
+    padding: 14px; 
+    border: 1px solid var(--border); 
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #0f172a;
+    color: var(--text-main);
+    outline: none;
+    transition: border 0.2s;
+}
+input:focus { border-color: var(--primary); background: #020617; }
+.button-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+button { 
+    padding: 14px; 
+    border: none;
+    border-radius: 10px;
+    cursor: pointer; 
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: transform 0.1s, opacity 0.2s;
+}
+.btn-add { background: var(--primary); color: white; flex: 2; }
+.btn-clear { background: #bd4407; color: var(--text-sub); flex: 1; font-size: 0.75rem; }
+button:active { transform: scale(0.98); }
+button:hover { opacity: 0.9; }
+ul { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--border); }
+li { 
+    padding: 15px 5px; 
+    border-bottom: 1px solid var(--border); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+.item-label { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.dot { color: var(--primary); font-size: 0.6rem; }
+.amt-label { font-weight: 700; color: var(--text-main); }
+.delete-btn { 
+    color: #94a3b8; 
+    cursor: pointer; 
+    margin-left: 12px;
+    font-size: 1rem;
+}
+.delete-btn:hover { color: var(--danger); 
+}
+.wallet-container {
+    margin-top: 30px;
+    margin-left: 30px;
+    background-color: #37a7cf;
+}
 
-    }
-    h1 {
-      color: #000000;
-    }
-    .tracker {
-      background: #a0b4d0;
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 400px;
-      box-shadow: 0 2px 5px rgba(155, 57, 57, 0.1);
-    }
-    input {
-      padding: 8px;
-      margin: 5px 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      padding: 10px;
-      margin: 5px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .add {
-      background-color: #4CAF50;
-      color: white;
-    }
-    .subtract {
-      background-color: #f44336;
-      color: white;
-    }
-    .balance {
-      font-size: 1.2em;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    .app-logo {
-    width: 100px; 
-    height: auto;  
-    }
-
-  </style>
+#prediction {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    margin-top: 10px;
+    background: #0f172a;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+</style>
 </head>
 <body>
-  
-  <div class="text-center mb-3">
-    <img src="icons/icon512/512.png" class="app-logo" alt="logo" />
-        <h2>Budget Tracker</h2>
-  </div>
-  <div class="tracker">
-    <label for="amount">Enter Amount:</label>
-    <input type="number" id="amount" placeholder="e.g. 100">
-    <div>
-      <button class="add" onclick="addAmount()">Add</button>
-      <button class="subtract" onclick="subtractAmount()">Subtract</button>
+
+<div class="container">
+    <h2>Available Balance</h2>
+    <div class="total-box">P<span id="t">0.00</span></div>
+    
+    <div class="input-section">
+        <input type="text" id="k" placeholder="Item Name">
+        <input type="number" id="v" placeholder="Amount">
     </div>
-    <div class="balance">Allowance Balance: ₱<span id="balance">0</span></div>
-  </div>
 
-  <script>
-  // Load saved balance from localStorage when the page opens
-  let balance = parseFloat(localStorage.getItem("balance")) || 0;
-  document.getElementById('balance').textContent = balance.toFixed(2);
+    <div class="button-row">
+        <button class="btn-add" onclick="addItem()">+ ADD ITEM</button>
+        <button class="btn-clear" onclick="resetAll()">RESET</button>
+    </div>
 
-  function addAmount() {
-    const amount = parseFloat(document.getElementById('amount').value);
-    if (!isNaN(amount) && amount > 0) {
-      balance += amount;
-      updateBalance();
-    } else {
-      alert("Please enter a valid positive number.");
+    <ul id="l"></ul>
+</div>
+
+<div class="container wallet-container">
+    <h2>E-Wallet</h2>
+    <div class="total-box">P<span id="walletBalance">0.00</span></div>
+    
+    <div class="input-section">
+        <input type="number" id="walletDeposit" placeholder="Deposit Amount">
+    </div>
+    <div class="button-row">
+        <button class="btn-add" onclick="depositMoney()">+ SAVE MONEY</button>
+    </div>
+
+    <h2>Budget Prediction</h2>
+    <div id="prediction"></div>
+</div>
+
+<script>
+const SB_URL = "https://hjpsqsqgkqvvcglcvohh.supabase.co"; 
+const SB_KEY = "sb_publishable_7nRlAl6Ar74H_d5IdvXFFA_c0mAsS_f"; 
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+const totalEl = document.getElementById('t'), 
+      listEl = document.getElementById('l'), 
+      nameInp = document.getElementById('k'), 
+      amtInp = document.getElementById('v');
+
+async function showData() {
+    let { data, error } = await sb.from('tracker-db').select('*');
+    if (error) return console.log(error);
+
+    listEl.innerHTML = "";
+    let total = 0;
+    data.forEach(item => {
+        total += item.amount;
+        let li = document.createElement('li');
+        li.innerHTML = `
+            <span class="item-label"><i class="fas fa-circle dot"></i> ${item.item}</span>
+            <span>
+                <span class="amt-label">P${item.amount.toFixed(2)}</span>
+                <i class="fas fa-times-circle delete-btn" onclick="deleteItem(${item.id})"></i>
+            </span>
+        `;
+        listEl.appendChild(li);
+    });
+    totalEl.innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
+}
+
+async function addItem() {
+    const name = nameInp.value;
+    const amount = parseFloat(amtInp.value);
+    if (name && amount > 0) {
+        const { error } = await sb.from('tracker-db').insert([{ item: name, amount: amount }]);
+        if (!error) {
+            nameInp.value = ''; amtInp.value = '';
+            showData();
+        }
     }
-  }
+}
 
-  function subtractAmount() {
-    const amount = parseFloat(document.getElementById('amount').value);
-    if (!isNaN(amount) && amount > 0) {
-      balance -= amount;
-      updateBalance();
-    } else {
-      alert("Please enter a valid positive number.");
+async function deleteItem(id) {
+    await sb.from('tracker-db').delete().eq('id', id);
+    showData();
+}
+
+async function resetAll() {
+    if(confirm("Delete all history?")) {
+        await sb.from('tracker-db').delete().neq('id', 0);
+        showData();
     }
-  }
+}
 
-  function updateBalance() {
-    document.getElementById('balance').textContent = balance.toFixed(2);
-    document.getElementById('amount').value = "";
-    // Save balance to localStorage
-    localStorage.setItem("balance", balance);
-  }
+showData();
 
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js")
-      .then(reg => console.log("Service Worker registered:", reg))
-      .catch(err => console.log("Service Worker registration failed:", err));
-  }
+// --- E-Wallet Logic ---
+let walletBalance = parseFloat(localStorage.getItem("walletBalance")) || 0;
+const walletEl = document.getElementById("walletBalance");
+const depositInp = document.getElementById("walletDeposit");
+const predictionEl = document.getElementById("prediction");
+
+function updateWallet() {
+    walletEl.innerText = walletBalance.toLocaleString(undefined, {minimumFractionDigits: 2});
+    localStorage.setItem("walletBalance", walletBalance);
+    predictBudget();
+}
+
+function depositMoney() {
+    const deposit = parseFloat(depositInp.value);
+    if (deposit > 0) {
+        walletBalance += deposit;
+        depositInp.value = "";
+        updateWallet();
+    }
+}
+
+// Override addItem to subtract from wallet
+async function addItem() {
+    const name = nameInp.value;
+    const amount = parseFloat(amtInp.value);
+    if (name && amount > 0) {
+        if (walletBalance >= amount) {
+            walletBalance -= amount; // subtract cost from wallet
+            updateWallet();
+            const { error } = await sb.from('tracker-db').insert([{ item: name, amount: amount }]);
+            if (!error) {
+                nameInp.value = ''; amtInp.value = '';
+                showData();
+            }
+        } else {
+            alert("Insufficient wallet balance!");
+        }
+    }
+}
+
+function predictBudget() {
+    sb.from('tracker-db').select('*').then(({ data, error }) => {
+        if (error || !data.length) {
+            predictionEl.innerText = "No spending data yet.";
+            return;
+        }
+        let totalSpent = data.reduce((sum, item) => sum + item.amount, 0);
+        let avgSpend = totalSpent / data.length;
+        let forecast = avgSpend > 0 ? Math.floor(walletBalance / avgSpend) : 0;
+        predictionEl.innerText = `At your current spending rate (P${avgSpend.toFixed(2)} per item), your wallet can cover about ${forecast} more items.`;
+    });
+}
+
+// Initialize wallet display
+updateWallet();
+
 </script>
 
 </body>
